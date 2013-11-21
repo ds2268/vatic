@@ -48,7 +48,14 @@ def getjob(id, verified):
             "jobid":        job.id,
             "training":     int(training),
             "labels":       labels,
-            "attributes":   attributes}
+            "attributes":   attributes,
+#            "orientation":  job.orientation,
+            "comment":      job.comment,
+            "action":       video.action}
+#            "actionstart":  job.actionstart,
+#            "actionstop":   job.actionstop}
+
+
 
 @handler()
 def getboxesforjob(id):
@@ -106,6 +113,30 @@ def readpaths(tracks):
 def savejob(id, tracks):
     job = session.query(Job).get(id)
 
+    for path in job.paths:
+        session.delete(path)
+    session.commit()
+    for path in readpaths(tracks):
+        job.paths.append(path)
+
+    session.add(job)
+    session.commit()
+
+@handler(post = "json")
+def savejob1(id, data):
+    # data contain comment, orientation, tracks
+    job = session.query(Job).get(id)
+
+    # seperate three parts
+    #job.actionstart = data[0][0]
+    #job.actionstop = data[1][0]
+    #job.orientation = data[2][0]
+    job.comment = data[3][0]
+    if job.comment == "null":
+        job.comment = "NULL"
+    tracks = data[4]
+    
+    # delete old path in the database
     for path in job.paths:
         session.delete(path)
     session.commit()

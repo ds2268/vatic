@@ -121,14 +121,17 @@ class load(LoadCommand):
         parser.add_argument("--for-training-tolerance", type=float, default=0.2)
         parser.add_argument("--for-training-mistakes", type=int, default=0)
         parser.add_argument("--for-training-data", default = None)
-        parser.add_argument("--blow-radius", default = 3)
+        # added by Menglong Zhu <06-27-2012>
+        parser.add_argument("--blow-radius", default = 0) 
+        parser.add_argument("--action", default = None)
+        parser.add_argument("--pose", default = None)
         return parser
 
     def title(self, args):
-        return "Video annotation"
+        return "Sports Video annotation"
 
     def description(self, args):
-        return "Draw boxes around objects moving around in a video."
+        return "Draw circle around moving human joints in a video."
 
     def cost(self, args):
         return 0.05
@@ -137,7 +140,7 @@ class load(LoadCommand):
         return 7200 * 3
 
     def keywords(self, args):
-        return "video, annotation, computer, vision"
+        return "video, annotation, sports"
 
     def __call__(self, args, group):
         print "Checking integrity..."
@@ -207,7 +210,9 @@ class load(LoadCommand):
                       completionbonus = args.completion_bonus,
                       trainwith = trainer,
                       isfortraining = args.for_training,
-                      blowradius = args.blow_radius)
+                      blowradius = args.blow_radius,
+                      action = args.action,
+                      pose = args.pose)
 
         if args.for_training:
             video.trainvalidator = qa.tolerable(args.for_training_overlap,
@@ -576,7 +581,8 @@ class dump(DumpCommand):
         scale = args.scale
         if args.dimensions or args.original_video:
             if args.original_video:
-                w, h = ffmpeg.extract(args.original_video).next().size
+                #w, h = ffmpeg.extract(args.original_video).next().size
+                w, h = ffmpeg.info().get_size(args.original_video)
             else:
                 w, h = args.dimensions.split("x")
             w = float(w)

@@ -33,6 +33,8 @@ class Video(turkic.database.Base):
     isfortraining   = Column(Boolean, default = False)
     trainvalidator  = Column(PickleType, nullable = True, default = None)
     blowradius      = Column(Integer, default = 5)
+    action          = Column(String(250))
+    pose            = Column(String(250))
 
     def __getitem__(self, frame):
         path = Video.getframepath(frame, self.location)
@@ -128,6 +130,11 @@ class Job(turkic.models.HIT):
                                   backref = backref("jobs",
                                                     cascade = "all,delete"))
     istraining     = Column(Boolean, default = False)
+    # added by menglong
+#    orientation    = Column(Integer, default = 0)
+    comment        = Column(String(250))
+#    actionstart    = Column(Integer, default = 0)
+#    actionstop     = Column(Integer, default = 0)
 
     def getpage(self):
         return "?id={0}".format(self.id)

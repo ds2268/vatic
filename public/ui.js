@@ -21,53 +21,113 @@ function ui_build(job)
             $("#turkic_acceptfirst").effect("pulsate");
         }
     });
+
+    job.inactive = 0;
+    /*window.setInterval(function(){
+        if (mturk_isoffline())
+        {
+            job.inactive++;
+            if (job.inactive > 2){
+                job.autosave = true;
+                $("#submitbutton").click();
+                job.autosave = false;
+                job.inactive = 0;
+            }
+        }
+    },60000);*/
 }
 
 function ui_setup(job)
 {
     var screen = $("<div id='annotatescreen'></div>").appendTo(container);
 
+    screen.mousemove(function(event){
+        job.inactive = 0;
+    });
+
     $("<table>" + 
         "<tr>" +
-            "<td><div id='instructionsbutton' class='button'>Instructions</div><div id='instructions'>Annotate every object, even stationary and obstructed objects, for the entire video.</td>" +
+            "<td><div id='instructionsbutton' class='button'>Instructions</div>" + 
+            //<2012-12-03> modified 3 lines for Ben Sapp's application
+            //"<div id='instructions'>Annotate every visible body joints for the <strong>" +
+			//job.action.replace(/_/g, " ") + 
+			//"</strong> action across the entire video." + 
+            "<div id='instructions'>Annotate every visible upper body joints across the entire video" +
+            "<br/> <strong> for the person marked by the green box in the small image on the right side </strong> </td>" +
             "<td><div id='topbar'></div></td>" +
         "</tr>" +
         "<tr>" +
               "<td><div id='videoframe'></div></td>" + 
-              "<td rowspan='2'><div id='sidebar'></div></td>" +
+              "<td rowspan='4'><div id='sidebar'></div></td>" +
           "</tr>" + 
           "<tr>" +
               "<td><div id='bottombar'></div></td>" + 
           "</tr>" +
           "<tr>" +
-              "<td><div id='advancedoptions'></div></td>" +
-              "<td><div id='submitbar'></div></td>" +
+              "<td><div id='advancedoptions'></div>" + 
+              "</td>" +
           "</tr>" +
+          "<tr>" +
+              "<td><!--<div>Comments:</div>-->" + 
+              "<textarea id='commentarea' />" + 
+              "<div id='submitbar'></div><br/><br/>"+
+              '<div><ul class="keyboardshortcuts" display="inline" >' +
+              '<li><code>n</code>  creates a new human joint</li>' +
+              '<li><code>t</code>  toggles play/pause on the video</li>' +
+              '<li><code>r</code>  rewinds the video to the start</li>' +
+              '<li><code>f</code>  jump forward 5 frames</li>' +
+              '<li><code>d</code>  jump backward 5 frames</li>' +
+              '<li><code>v</code>  step forward 1 frame</li>' +
+              '<li><code>c</code>  step backward 1 frame</li>' +
+              '</ul>' +
+              '<img src="body_joint_fig.jpg" display="inline" width="350px"></div>' +  
+              "</td>" +
+          "</tr>" +
+ 
       "</table>").appendTo(screen).css("width", "100%");
-
-
-    var playerwidth = Math.max(720, job.width);
 
 
     $("#videoframe").css({"width": job.width + "px",
                           "height": job.height + "px",
-                          "margin": "0 auto"})
-                    .parent().css("width", playerwidth + "px");
+                          "margin": "0 auto" })
+                    .parent().css("width", Math.max("720", job.width) + "px");
+    $("#commentarea").css({"width": Math.max("720", job.width) + "px",
+                            "height": "100 px",
+                            "margin": "15 auto",
+							"resize": "none"}).hide();
+    $("#sidebar").css("height", 600 + "px");
 
-    $("#sidebar").css({"height": job.height + "px",
-                       "width": "205px"});
-
-    $("#annotatescreen").css("width", (playerwidth + 205) + "px");
+    //$("#openadvancedoptions").css("float","right").css("clear","both");
 
     $("#bottombar").append("<div id='playerslider'></div>");
     $("#bottombar").append("<div class='button' id='rewindbutton'>Rewind</div> ");
+    $("#bottombar").append("<div class='button' id='backwardbutton'> &nbsp;  </div> ");
     $("#bottombar").append("<div class='button' id='playbutton'>Play</div> ");
+    $("#bottombar").append("<div class='button' id='forwardbutton'> &nbsp; </div> ");
 
     $("#topbar").append("<div id='newobjectcontainer'>" +
-        "<div class='button' id='newobjectbutton'>New Object</div></div>");
+        "<div class='button' id='newobjectbutton'>New Joint</div></div>");
 
+
+    // subject orientation radio box, added by menglong
+    //$("#sidebar").append(
+            //"<div id='orientation'>" + 
+            //"<label>Person Orientation:</label>" +
+            //"<input type='radio' id='orientfront' name='orientation' value='1' >" + 
+            //"<label for='orientfront'>front</label>" +
+            //"<input type='radio' id='orientback' name='orientation'  value='2' >" + 
+            //"<label for='orientback'>back</label>" +
+            //"<input type='radio' id='orientleft' name='orientation'  value='3' >" + 
+            //"<label for='orientleft'>left</label>" +
+            //"<input type='radio' id='orientright' name='orientation' value='4' >" + 
+            //"<label for='orientright'>right</label>" +
+            //"</div>");
+
+    //$("#sidebar#orientation").hide();
     $("<div id='objectcontainer'></div>").appendTo("#sidebar");
 
+    $("textarea#commentarea").val(job.comment);
+    
     $("<div class='button' id='openadvancedoptions'>Options</div>")
         .button({
             icons: {
@@ -82,11 +142,11 @@ function ui_setup(job)
     $("#advancedoptions").hide();
 
     $("#advancedoptions").append(
-    "<input type='checkbox' id='annotateoptionsresize'>" +
-    "<label for='annotateoptionsresize'>Disable Resize?</label> " +
+    "<!--<input type='checkbox' id='annotateoptionsresize'>" +
+    "<label for='annotateoptionsresize'>Disable Resize?</label>--> " +
     "<input type='checkbox' id='annotateoptionshideboxes'>" +
-    "<label for='annotateoptionshideboxes'>Hide Boxes?</label> " +
-    "<input type='checkbox' id='annotateoptionshideboxtext'>" +
+    "<label for='annotateoptionshideboxes'>Hide Circles?</label> " +
+    "<input type='checkbox' id='annotateoptionshideboxtext' checked='checked'>" +
     "<label for='annotateoptionshideboxtext'>Hide Labels?</label> ");
 
     $("#advancedoptions").append(
@@ -95,24 +155,38 @@ function ui_setup(job)
         "value='5,1' id='speedcontrolslower'>" +
     "<label for='speedcontrolslower'>Slower</label>" +
     "<input type='radio' name='speedcontrol' " +
-        "value='15,1' id='speedcontrolslow'>" +
+        "value='15,1' id='speedcontrolslow' checked='checked'>" +
     "<label for='speedcontrolslow'>Slow</label>" +
     "<input type='radio' name='speedcontrol' " +
-        "value='30,1' id='speedcontrolnorm' checked='checked'>" +
+        "value='30,1' id='speedcontrolnorm'>" +
     "<label for='speedcontrolnorm'>Normal</label>" +
     "<input type='radio' name='speedcontrol' " +
         "value='90,1' id='speedcontrolfast'>" +
     "<label for='speedcontrolfast'>Fast</label>" +
     "</div>");
 
+    
     $("#submitbar").append("<div id='submitbutton' class='button'>Submit HIT</div>");
 
     if (mturk_isoffline())
-    {
-        $("#submitbutton").html("Save Work");
+	{
+		$("#submitbutton").html("Save Work");
+		//$("#submitbar").append("<div id='nextbutton' class='button'>next</div>");
     }
 
     return screen;
+}
+
+function loadnext(job) {
+    var nextId = job.jobid+1;
+    document.location.href='/?id='+ nextId + '&hitId=offline';
+    //$('#nextbutton').button({
+    //	icons: {
+    //	primary: 'ui-icon-check'
+    //	}       
+    //}).click(function() {
+    //	document.location.href='/?id='+ nextId + '&hitId=offline';
+    //});     
 }
 
 function ui_setupbuttons(job, player, tracks)
@@ -158,6 +232,72 @@ function ui_setupbuttons(job, player, tracks)
             primary: "ui-icon-seek-first"
         }
     });
+    
+    $("#forwardbutton").click(function() {
+        if (ui_disabled) return;
+        var skip = job.skip > 0 ? job.skip : 1;
+        player.pause();
+        player.displace(skip);
+        ui_snaptokeyframe(job, player);
+        eventlog("forward", "seek next");
+    }).button({
+        disabled: false,
+        icons: {
+            primary: "ui-icon-seek-next"
+        }
+    });
+
+    $("#backwardbutton").click(function() {
+        if (ui_disabled) return;
+        var skip = job.skip > 0 ? -job.skip : -1;
+        player.pause();
+        player.displace(skip);
+        ui_snaptokeyframe(job, player);
+        eventlog("backward", "seek previous");
+    }).button({
+        disabled: false,
+        icons: {
+            primary: "ui-icon-seek-prev"
+        }
+    });
+
+/*
+    $("#startbutton").click(function() {
+        eventlog("backward", "seek previous");
+    }).button({
+        disabled: true,
+        icons: {
+            primary: "ui-icon-seek-prev"
+        }
+    });
+/*
+    $("#startbutton").click(function() {
+        if (player.frame >= job.actionstop) {
+            window.alert("action start shouldn't be later than stop");
+            return;
+        }
+
+        //if (window.confirm("action start from this frame?")) {
+            job.actionstart = player.frame;
+            if (job.actionstop < job.actionstart){
+                job.actionstop = job.actionstart;
+            }
+            player.updateSliderValid();
+        //}
+    }).button({disabled: false});
+
+    $("#stopbutton").click(function() {
+        if (player.frame <= job.actionstart) {
+            window.alert("action stop shouldn't be ealier than start");
+            return;
+        }
+
+        //if (window.confirm("action stop from this frame?")){
+            job.actionstop = player.frame;
+            player.updateSliderValid();
+        //} 
+    }).button({disabled: false});
+*/
 
     player.onplay.push(function() {
         $("#playbutton").button("option", {
@@ -195,6 +335,7 @@ function ui_setupbuttons(job, player, tracks)
         {
             $("#rewindbutton").button("option", "disabled", false);
         }
+
     });
 
     $("#speedcontrol").buttonset();
@@ -211,18 +352,61 @@ function ui_setupbuttons(job, player, tracks)
         eventlog("speedcontrol", "FPS = " + player.fps + " and delta = " + player.playdelta);
     });
 
-    $("#annotateoptionsresize").button().click(function() {
-        var resizable = !$(this).attr("checked")
-        tracks.resizable(resizable);
+    // added by menglong
+    //$("#orientation").buttonset();
+    //$("input[name='orientation']").click(function() {
+    //    job.orientation = parseInt($(this).val());
+    //    console.log("orientation set to:" + job.orientation);
+    //});
 
-        if (resizable)
-        {
-            eventlog("disableresize", "Objects can be resized");
-        }
-        else
-        {
-            eventlog("disableresize", "Objects can not be resized");
-        }
+    $("#commentarea").focusin(function() {
+        ui_disabled = true;
+        console.log("ui disabled");
+    });
+
+    String.prototype.trim = function() {
+        return this.replace(/^\s+|\s+$/g,"");
+    }
+    String.prototype.ltrim = function() {
+        return this.replace(/^\s+/,"");
+    }
+    String.prototype.rtrim = function() {
+        return this.replace(/\s+$/,"");
+    }
+
+    String.prototype.removelinebreak = function() {
+        return this.replace(/(\r\n|\n|\r)/gm,"  ");
+    }
+
+    String.prototype.delquote = function() {
+        return this.replace(/["']{1}/gi,"&quot;"); 
+    }
+
+    $("#commentarea").focusout(function() {
+        ui_disabled = false;
+        console.log("ui enabled");
+        job.comment = ($(this).val()).removelinebreak().delquote();
+        console.log("comment added:" + job.comment);
+    });
+
+
+    $("#annotateoptionsresize").button().click(function() {
+	    // menglong. added to disable resize
+        eventlog("disableresize", "Objects resize disabled");
+	    return;
+
+	   // var resizable = !$(this).attr("checked");
+       // tracks.resizable(resizable);
+
+       // if (resizable)
+       // {
+       //     eventlog("disableresize", "Objects can be resized");
+       // }
+       // else
+       // {
+       //     eventlog("disableresize", "Objects can not be resized");
+       // }
+
     });
 
     $("#annotateoptionshideboxes").button().click(function() {
@@ -283,16 +467,24 @@ function ui_setupkeyboardshortcuts(job, player)
         {
             $("#annotateoptionshideboxes").click();
         }
+        else if (keycode == 106)
+        {
+//            $("#startbutton").click();
+        }
+        else if (keycode == 107)
+        {
+//            $("#stopbutton").click();
+        }
         else 
         {
             var skip = 0;
             if (keycode == 44 || keycode == 100)
             {
-                skip = job.skip > 0 ? -job.skip : -10;
+                skip = job.skip > 0 ? -job.skip : -5;
             }
             else if (keycode == 46 || keycode == 102)
             {
-                skip = job.skip > 0 ? job.skip : 10;
+                skip = job.skip > 0 ? job.skip : 5;
             }
             else if (keycode == 62 || keycode == 118)
             {
@@ -331,6 +523,7 @@ function ui_setupslider(player)
     slider.slider({
         range: "min",
         value: player.job.start,
+        //values: [player.job.actionstart, player.job.actionstart],
         min: player.job.start,
         max: player.job.stop,
         slide: function(event, ui) {
@@ -341,19 +534,61 @@ function ui_setupslider(player)
         }
     });
 
-    /*slider.children(".ui-slider-handle").hide();*/
+    //slider.children(".ui-slider-handle").css("border-color");
     slider.children(".ui-slider-range").css({
-        "background-color": "#868686",
+        "background-color": "white",//"#868686",
         "background-image": "none"});
 
     slider.css({
         marginTop: "6px",
-        width: parseInt(slider.parent().css("width")) - 200 + "px", 
+        marginRight: "8px",
+        width: "430px",
         float: "right"
     });
 
+    originalSlider = slider.children(".ui-slider-range");
+    sliderRange = originalSlider.clone();
+    sliderRange.width(0);
+    sliderRange.css("background-color","orange");
+    //player.sliderRangeStart = sliderRange;
+    //player.sliderRangeStop = sliderRange.clone();
+    player.sliderRangeValid = sliderRange.clone();
+
+    player.sliderRangeValid.appendTo(slider);
+
+    //player.updateSliderStart = function() {
+    //    if (player.job.actionstart > player.job.start) {
+    //            var leftoffset = ((player.job.actionstart - player.job.start)/
+    //                (player.job.stop - player.job.start))*player.sliderRangeStart.parent().width();
+    //            player.sliderRangeStart.width(leftoffset);
+    //    }
+    //}
+
+    //player.updateSliderStop = function() {
+    //    if (player.job.actionstop > player.job.actionstart) {
+    //            var leftoffset = ((player.job.actionstop - player.job.start)/
+    //                (player.job.stop - player.job.start))*player.sliderRangeStop.parent().width();
+    //            var width = player.sliderRangeStop.parent().width() - leftoffset;
+    //            player.sliderRangeStop.css({"left": leftoffset, "width": width});
+    //    }
+    //}
+
+    player.updateSliderValid = function() {
+        //if (player.job.actionstart > player.job.start ) { 
+            var leftoffset = ((player.job.actionstart - player.job.start)/
+                    (player.job.stop - player.job.start))*player.sliderRangeValid.parent().width();
+
+            var rightoffset = ((player.job.actionstop - player.job.start)/
+                    (player.job.stop - player.job.start))*player.sliderRangeValid.parent().width();
+            width = rightoffset - leftoffset;
+            player.sliderRangeValid.css({"left": leftoffset, "width": width});
+        //}
+    }
+
+    player.updateSliderValid();
+
     player.onupdate.push(function() {
-        slider.slider({value: player.frame});
+        slider.slider({value:  player.frame});
     });
 }
 
@@ -394,7 +629,8 @@ function ui_setupclickskip(job, player, tracks, objectui)
             $("#newobjectbutton").button("option", "disabled", false);
             $("#playbutton").button("option", "disabled", false);
             tracks.draggable(true);
-            tracks.resizable(ui_canresize());
+            //tracks.resizable(ui_canresize());
+            tracks.resizable(false);
             tracks.recordposition();
             objectui.enable();
         }
@@ -446,7 +682,14 @@ function ui_setupsubmit(job, tracks)
 function ui_submit(job, tracks)
 {
     console.dir(tracks);
+//    console.log("actionstart: " + job.actionstart);
+//    console.log("actionstop: " + job.actionstop);
     console.log("Start submit - status: " + tracks.serialize());
+
+    completeinfo = "[[" + job.actionstart + "],[" + job.actionstop + "],[" 
+        + job.orientation + "],[\"" + job.comment + "\"]," + tracks.serialize() + "]";
+
+    console.log("full info: " + completeinfo);
 
     if (!mturk_submitallowed())
     {
@@ -500,8 +743,9 @@ function ui_submit(job, tracks)
     
     function savejob(callback)
     {
-        server_post("savejob", [job.jobid],
-            tracks.serialize(), function(data) {
+        server_post("savejob1", [job.jobid],
+            completeinfo , // tracks.serialize()
+            function(data) {
                 callback()
             });
     }
@@ -514,6 +758,7 @@ function ui_submit(job, tracks)
                 note.remove();
                 overlay.remove();
                 ui_enable();
+                //loadnext(job);
             }, 1000);
         }
         else
@@ -524,31 +769,51 @@ function ui_submit(job, tracks)
         }
     }
 
-    if (job.training)
+    function autosave()
     {
-        console.log("Submit redirect to train validate");
+        window.setTimeout(function() {
+                note.remove();
+                overlay.remove();
+                ui_enable();
+                }, 1000);
+    }
 
-        note.html("Checking...");
-        validatejob(function() {
-            savejob(function() {
-                mturk_submit(function(redirect) {
-                    respawnjob(function() {
-                        note.html("Good work!");
-                        finishsubmit(redirect);
-                    });
+    if (job.autosave)
+    {
+        note.html("Auto Saving...");
+        savejob(function() {
+                note.html("Auto Saved!");
+                autosave();
                 });
-            });
-        });
     }
     else
     {
-        note.html("Saving...");
-        savejob(function() {
-            mturk_submit(function(redirect) {
-                note.html("Saved!");
-                finishsubmit(redirect);
-            });
-        });
+        if (job.training)
+        {
+            console.log("Submit redirect to train validate");
+
+            note.html("Checking...");
+            validatejob(function() {
+                    savejob(function() {
+                        mturk_submit(function(redirect) {
+                            respawnjob(function() {
+                                note.html("Good work!");
+                                finishsubmit(redirect);
+                                });
+                            });
+                        });
+                    });
+        }
+        else
+        {
+            note.html("Saving...");
+            savejob(function() {
+                    mturk_submit(function(redirect) {
+                        note.html("Saved!");
+                        finishsubmit(redirect);
+                        });
+                    });
+        }
     }
 }
 
@@ -564,8 +829,8 @@ function ui_submit_failedvalidation()
     h.append("<p>Please review the instructions, double check your annotations, and submit again. Remember:</p>");
 
     var str = "<ul>";
-    str += "<li>You must label every object.</li>";
-    str += "<li>You must draw your boxes as tightly as possible.</li>";
+    str += "<li>You must label every visible joints.</li>";
+    str += "<li>You must annotate the joints as precise as possible.</li>";
     str += "</ul>";
 
     h.append(str);

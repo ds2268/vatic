@@ -11,7 +11,7 @@ function VideoPlayer(handle, job)
     this.job = job;
     this.frame = job.start;
     this.paused = true;
-    this.fps = 30;
+    this.fps = 15; // changed from normal (30) to slow (15)
     this.playdelta = 1;
 
     this.onplay = []; 

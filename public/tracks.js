@@ -35,22 +35,31 @@ function BoxDrawer(container)
         this.hcrosshair = $('<div></div>').appendTo(this.container);
         this.vcrosshair = $('<div></div>').appendTo(this.container);
 
+        var offset = this.container.offset();
         this.vcrosshair.css({
             width: '2px',
-            height: '100%',
-            position: 'relative',
-            top: '0px',
-            left: '0px',
+            height: this.container.height(),
+            //height: '100%',
+            //position: 'relative',
+            //top: '0px',
+            //left: '0px',
+            position: 'absolute',
+            top: offset.top + "px",
+            left: offset.left + "px",
             backgroundColor: this.color,
             zIndex: 1
         }).hide();
 
         this.hcrosshair.css({
             height: '2px',
-            width: '100%',
-            position: 'relative',
-            top: '0px',
-            left: '0px',
+            width: this.container.width(),
+            //width: '100%',
+            //position: 'relative',
+            //top: '0px',
+            //left: '0px',
+            position: 'absolute',
+            top: offset.top + "px",
+            left: offset.left + "px",
             backgroundColor: this.color,
             zIndex: 1
         }).hide();
@@ -81,11 +90,12 @@ function BoxDrawer(container)
         {
             if (!this.drawing)
             {
-                this.startdrawing(xc, yc);
+                this.startdrawing(xc - 10, yc - 10);
+                this.finishdrawing(xc + 10, yc + 10);
             }
             else
             {
-                this.finishdrawing(xc, yc);
+                //this.finishdrawing(xc, yc);
             }
         }
     }
@@ -99,11 +109,13 @@ function BoxDrawer(container)
         {
             var pos = this.calculateposition(xc, yc);
             var offset = this.container.offset();
+            console.log("pos.width:" + pos.width);
+            console.log("pos.height:" + pos.height);
             this.handle.css({
                 "top": pos.ytl + offset.top + "px",
                 "left": pos.xtl + offset.left + "px",
-                "width": (pos.width - 3) + "px",
-                "height": (pos.height - 3)+ "px",
+                "width": (pos.width - this.htmloffset) + "px", // used to be pos.width - 3
+                "height": (pos.height - this.htmloffset) + "px",// used to be pos.width - 3
                 "border-color": this.color
             });
         }
@@ -118,8 +130,9 @@ function BoxDrawer(container)
         {
             if (visible && !this.drawing)
             {
-                this.vcrosshair.show().css('left', xc + 'px');
-                this.hcrosshair.show().css('top', yc + 'px');
+                var offset = this.container.offset();
+                this.vcrosshair.show().css('left', offset.left + xc + 'px');
+                this.hcrosshair.show().css('top', offset.top + yc + 'px');
             }
             else
             {
@@ -178,6 +191,7 @@ function BoxDrawer(container)
             console.log("Finishing drawing");
 
             var position = this.calculateposition(xc, yc);
+            console.log("bbox size: " + (position.xbr-position.xtl) + "x" + (position.ybr-position.ytl));
 
             // call callbacks
             for (var i in this.onstopdraw)
@@ -259,9 +273,24 @@ function TrackCollection(player, job)
 
     this.player = player;
     this.job = job;
+    this.job.labelSelected = new Array();
+    this.job.labelSelectedId = new Array();
+    this.job.numLabelSelected = 0;
+    for (var i in this.job.labels)
+    {
+        this.job.labelSelected[i] = false;
+        this.job.labelSelectedId[i] = 0;
+	    console.log("labelSelected:" + i.toString());
+    }
     this.tracks = [];
 
     this.onnewobject = []; 
+
+    // add new attributes by menglong, here for default val
+    //1, for front, 2 for back, 3 for left, 4 for right
+    this.poseOrientation = 1; 
+    this.comment = "";
+    // ----------------------------
 
     player.onupdate.push(function() {
         me.update(player.frame);
@@ -285,6 +314,8 @@ function TrackCollection(player, job)
     this.add = function(frame, position, color)
     {
         var track = new Track(this.player, color, position);
+	    // modified by menglong
+	    track.resizable(false);
         this.tracks.push(track);
 
         console.log("Added new track");
@@ -425,7 +456,7 @@ function Track(player, color, position)
     this.player = player;
     this.handle = null;
     this.color = color;
-    this.htmloffset = 3;
+    this.htmloffset = 0;
     this.deleted = false;
 
     this.onmouseover = [];
@@ -449,6 +480,8 @@ function Track(player, color, position)
 
     this.journal.artificialrightframe = this.player.job.stop;
     this.journal.artificialright = position;
+
+    
 
     /*
      * Polls the on screen position of the box and returns it.
@@ -530,7 +563,35 @@ function Track(player, color, position)
         var xbr = Math.min(pos.xbr, width - 1);
         var ybr = Math.min(pos.ybr, height - 1);
 
+        // <07-09-2012> force the bbox stay within frame
+        if (xbr - xtl < 20)
+        {
+            if (xtl == 0)
+            {
+                xbr = 20;
+            }
+
+            if (xbr == width-1)
+            {
+                xtl = width - 21;
+            }
+        }
+
+        if (ybr - ytl < 20)
+        {
+            if (ytl == 0)
+            {
+                ybr = 20;
+            }
+
+            if (ybr == height-1)
+            {
+                ytl = height - 21;
+            }
+        }
+
         var fpos = new Position(xtl, ytl, xbr, ybr);
+        console.log("fixposition: " + xtl + "," +ytl+ ","+ xbr + ","+ ybr);
         fpos.occluded = pos.occluded;
         fpos.outside = pos.outside;
 
@@ -664,7 +725,7 @@ function Track(player, color, position)
     this.setlock = function(value)
     {
         this.locked = value;
-
+	console.log("changes the lock states");
         if (value)
         {
             this.handle.draggable("option", "disabled", true);
@@ -695,16 +756,19 @@ function Track(player, color, position)
         {
             this.handle = $('<div class="boundingbox"><div class="boundingboxtext"></div></div>');
             this.handle.css("border-color", this.color);
+            this.handle.css("border-radius", "12px");
             var fill = $('<div class="fill"></div>').appendTo(this.handle);
             fill.css("background-color", this.color);
+            var center= $('<div class="ccenter"></div>').appendTo(this.handle);
+            center.css("background-color", this.color);
             this.player.handle.append(this.handle);
 
             this.handle.children(".boundingboxtext").hide().css({
                 "border-color": this.color,
                 //"color": this.color
-                });
+            });
 
-            this.handle.resizable({
+            /*this.handle.resizable({
                 handles: "n,w,s,e",
                 autoHide: true,
                 start: function() {
@@ -726,7 +790,7 @@ function Track(player, color, position)
                 resize: function() {
                     me.highlight(true);
                 }
-            });
+            });*/
 
             this.handle.draggable({
                 start: function() {
@@ -799,6 +863,35 @@ function Track(player, color, position)
             width: (position.width - this.htmloffset) + "px",
             height: (position.height - this.htmloffset) + "px"
         });
+
+        console.log("width:"+position.width);
+        console.log("height:"+position.height);
+        console.log("this.htmloffset:"+this.htmloffset);
+        this.handle.children(".ccenter").css({
+            "position": "absolute",
+            "width": "6px",
+            "height": "6px",
+            "border-radius": "50%",
+             "margin-left": "-3px",
+             "margin-top": "-3px",
+            top:  "50%",
+            left: "50%",
+        });
+
+        // <2012-July-15> add circle
+        //if ( typeof this.handle.circle == 'undefined') {
+        //    console.log("add circle...........");
+        //    this.handle.circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+        //    player.mySvg.appendChild(this.handle.circle);
+        //}
+        //this.handle.circle.setAttribute("cx", position.xtl + 10);
+        //this.handle.circle.setAttribute("cy", position.ytl + 10);
+        //this.handle.circle.setAttribute("r", "10");
+        //this.handle.circle.setAttribute("r", "10");
+        //this.handle.circle.setAttribute("fill-opacity", 0);
+        //this.handle.circle.setAttribute("stroke", this.color);
+        //this.handle.circle.setAttribute("stroke-width", "2");
+
     }
 
     this.triggerinteract = function() 
