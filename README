@@ -1,11 +1,15 @@
 VATIC-ACTION: Video Annotation Tools for Human Actions,
 based on VATIC, http://web.mit.edu/vondrick/vatic/ 
 
-Author: Menglong Zhu, Univeristy of Pennsylvania, 
-<menglong AT cis DOT upenn DOT edu>
+This document will describe how to install and use VATIC-ACTION. If you want to modify
+VATIC-ACTION, please read DEVELOPERS after reading this document.
 
-This document will describe how to install and use VATIC. If you want to modify
-VATIC, please read DEVELOPERS after reading this document.
+== REFERENCES =================================================================
+
+When using our system, please cite:
+
+Weiyu Zhang, Menglong Zhu, Kosta Derpanis, "From Actemes to Action: A Strongly-supervised Representation for Detailed Action Understanding" International Conference on Computer Vision (ICCV). Dec 2013.
+
 
 == INSTALLATION ===============================================================
 
@@ -512,5 +516,11 @@ warn you and abort. You can force deletion with:
 
 which will REMOVE ALL DATA AND CANNOT BE UNDONE.
 
+== FEEDBACK AND BUGS ==========================================================
+
+Please direct all comments and report all bugs to:
+
+Menglong Zhu
+menglong@cis.upenn.edu
 
 Thanks for using our system!
