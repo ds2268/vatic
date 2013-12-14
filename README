@@ -8,8 +8,13 @@ VATIC-ACTION, please read DEVELOPERS after reading this document.
 
 When using our system, please cite:
 
-Weiyu Zhang, Menglong Zhu, Kosta Derpanis, "From Actemes to Action: A Strongly-supervised Representation for Detailed Action Understanding" International Conference on Computer Vision (ICCV). Dec 2013.
+    Weiyu Zhang, Menglong Zhu, Kosta Derpanis, "From Actemes to Action:
+    A Strongly-supervised Representation for Detailed Action Understanding" 
+    International Conference on Computer Vision (ICCV). Dec 2013.
 
+    Carl Vondrick, Deva Ramanan, Donald Patterson. "Efficiently Scaling Up
+    Video Annotation with Crowdsourced Marketplaces" European Conference on
+    Computer Vision (ECCV) Crete, Greece, September, 2010. 
 
 == INSTALLATION ===============================================================
 
