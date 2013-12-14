@@ -1,8 +1,8 @@
 VATIC-ACTION: Video Annotation Tools for Human Actions,
 based on VATIC, http://web.mit.edu/vondrick/vatic/ 
 
-This document will describe how to install and use VATIC-ACTION. If you want to modify
-VATIC-ACTION, please read DEVELOPERS after reading this document.
+This document will describe how to install and use VATIC-ACTION. If you want 
+to modify VATIC-ACTION, please read DEVELOPERS after reading this document.
 
 == REFERENCES =================================================================
 
@@ -203,7 +203,9 @@ options available as well. We recommend using these options.
                         annotations within this many frames. If you want to
                         allow the user to make fine-grained annotations, set
                         this number to a small integer, or 0 to disable. By
-                        default, this is 5, which we recommend.
+                        default, this is 0.
+        --action        action class name 
+        --pose          coarse camera view point
 
 You can also specify temporal attributes that each object label can take on.
 For example, you may have a person object with attributes "walking", "running",
@@ -326,6 +328,11 @@ definition of these columns are:
     9   generated. If 1, the annotation was automatically interpolated.
     10  label. The label for this annotation, enclosed in quotation marks.
     11+ attributes. Each column after this is an attribute.
+
+Note: VATIC-ACTION keeps the same xmin,ymin,xmax,ymax as in VATIC for 
+consistency purposes. They are computed and stored as a 10x10 pixels 
+bounding box around the joint position. For getting the joint position, 
+just take the center point of the bounding box.
 
 By default, the above command will not attempt to merge annotations across
 shot segments. You can request merging with the command:
