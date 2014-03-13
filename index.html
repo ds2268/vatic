@@ -38,7 +38,8 @@
 <p>This document will describe how to install and use VATIC-ACTION. If you want 
 to modify VATIC-ACTION, please read DEVELOPERS after reading this document.</p>
 
-<p>== REFERENCES =================================================================</p>
+<h1>
+<a name="-references-" class="anchor" href="#-references-"><span class="octicon octicon-link"></span></a>== REFERENCES ==</h1>
 
 <p>When using our system, please cite:</p>
 
@@ -51,13 +52,15 @@ Video Annotation with Crowdsourced Marketplaces" European Conference on
 Computer Vision (ECCV) Crete, Greece, September, 2010. 
 </code></pre>
 
-<p>== INSTALLATION ===============================================================</p>
+<h1>
+<a name="-installation-" class="anchor" href="#-installation-"><span class="octicon octicon-link"></span></a>== INSTALLATION ==</h1>
 
 <p>Note: VATIC has only been tested on Ubuntu with Apache 2.2 HTTP server and a
 MySQL server. This document will describe installation on this platform,
 however it should work any operating system and with any server.</p>
 
-<p>--- Download ------------------------------------------------------------------</p>
+<h2>
+<a name="----download----" class="anchor" href="#----download----"><span class="octicon octicon-link"></span></a>--- Download ---</h2>
 
 <p>You can download and extract VATIC from our website. Note: do NOT run the 
 installer as root. </p>
@@ -68,7 +71,8 @@ $ ./vatic-install.sh
 $ cd vatic
 </code></pre>
 
-<p>--- HTTP Server Configuration -------------------------------------------------</p>
+<h2>
+<a name="----http-server-configuration----" class="anchor" href="#----http-server-configuration----"><span class="octicon octicon-link"></span></a>--- HTTP Server Configuration ---</h2>
 
 <p>Open the Apache configuration file. On Ubuntu, this file is located at:</p>
 
@@ -106,7 +110,8 @@ host with the correct document root and script alias, as shown above.</p>
 <pre><code>$ sudo apache2ctl graceful
 </code></pre>
 
-<p>--- SQL Server Configuration --------------------------------------------------</p>
+<h2>
+<a name="----sql-server-configuration----" class="anchor" href="#----sql-server-configuration----"><span class="octicon octicon-link"></span></a>--- SQL Server Configuration ---</h2>
 
 <p>We recommend creating a separate database specifically for VATIC:</p>
 
@@ -116,7 +121,8 @@ mysql&gt; create database vatic;
 
 <p>The next section will automatically create the necessary tables.</p>
 
-<p>--- Setup ---------------------------------------------------------------------</p>
+<h2>
+<a name="----setup----" class="anchor" href="#----setup----"><span class="octicon octicon-link"></span></a>--- Setup ---</h2>
 
 <p>Inside the vatic directory, copy config.py-example to config.py:</p>
 
@@ -156,7 +162,8 @@ can leave the signature and accesskey empty.</p>
 <pre><code>$ turkic setup --public-symlink
 </code></pre>
 
-<p>== ANNOTATION =================================================================</p>
+<h1>
+<a name="-annotation-" class="anchor" href="#-annotation-"><span class="octicon octicon-link"></span></a>== ANNOTATION ==</h1>
 
 <p>Before you continue, you should verify that the installation was correct. You
 can verify this with:</p>
@@ -169,7 +176,8 @@ and you should review the previous section. Note: If you do not plan on
 using Mechanical Turk, you can safely ignore any errors caused by Mechanical
 Turk.</p>
 
-<p>--- Frame Extraction ----------------------------------------------------------</p>
+<h2>
+<a name="----frame-extraction----" class="anchor" href="#----frame-extraction----"><span class="octicon octicon-link"></span></a>--- Frame Extraction ---</h2>
 
 <p>Our system requires that videos are extracted into JPEG frames. Our tool can 
 do this automatically for you:</p>
@@ -203,7 +211,8 @@ formatframes command to format the video into a format that VATIC understands:</
 <p>The above command will read all the images in /path/to/frames and create
 hard links (soft copy) in /path/to/output/directory.</p>
 
-<p>--- Importing a Video ---------------------------------------------------------</p>
+<h2>
+<a name="----importing-a-video----" class="anchor" href="#----importing-a-video----"><span class="octicon octicon-link"></span></a>--- Importing a Video ---</h2>
 
 <p>After extracting frames, the video can be imported into our tool for 
 annotation. The general syntax for this operation is:</p>
@@ -273,7 +282,8 @@ prepend an ~ before the text, which bind the attribute to the previous label:</p
 will have attributes Attr2B, Attr2B, and Attr2C and Label3 will have no 
 attributes. Specifying attributes is optional.</p>
 
-<p>--- Gold Standard Training ---------------------------------------------------</p>
+<h2>
+<a name="----gold-standard-training----" class="anchor" href="#----gold-standard-training----"><span class="octicon octicon-link"></span></a>--- Gold Standard Training ---</h2>
 
 <p>It turns out that video annotation is extremely challenging and most MTurk
 workers lack the necessary patience. For this reason, we recommend requiring
@@ -317,7 +327,8 @@ as careful as possible, as it will be used to evaluate future workers.</p>
 <p>When a not-yet-seen worker visits this video, they will now be redirected to
 to the training video and be required to pass the evaluation test first.</p>
 
-<p>--- Publishing Tasks ---------------------------------------------------------</p>
+<h2>
+<a name="----publishing-tasks----" class="anchor" href="#----publishing-tasks----"><span class="octicon octicon-link"></span></a>--- Publishing Tasks ---</h2>
 
 <p>When you are ready for the MTurk workers to annotate, you must publish the 
 tasks, which will allow workers to start annotating:</p>
@@ -350,7 +361,8 @@ the command:</p>
 <pre><code>$ turkic load identifier /path/to/frames Person --offline
 </code></pre>
 
-<p>--- Checking the Status ------------------------------------------------------</p>
+<h2>
+<a name="----checking-the-status----" class="anchor" href="#----checking-the-status----"><span class="octicon octicon-link"></span></a>--- Checking the Status ---</h2>
 
 <p>You can check the status of the video annotation server with the command:</p>
 
@@ -372,7 +384,8 @@ statistics.</p>
 <pre><code>Server is offline.
 </code></pre>
 
-<p>--- Retrieving Annotations ---------------------------------------------------</p>
+<h2>
+<a name="----retrieving-annotations----" class="anchor" href="#----retrieving-annotations----"><span class="octicon octicon-link"></span></a>--- Retrieving Annotations ---</h2>
 
 <p>You can get all the annotations for a video with the command:</p>
 
@@ -440,7 +453,8 @@ videos have been downsampled:</p>
 
 <p>The specifications for these formats should be self explanatory.</p>
 
-<p>--- Visualizing Videos -------------------------------------------------------</p>
+<h2>
+<a name="----visualizing-videos----" class="anchor" href="#----visualizing-videos----"><span class="octicon octicon-link"></span></a>--- Visualizing Videos ---</h2>
 
 <p>You can preview the annotations by visualizing the results:</p>
 
@@ -468,7 +482,8 @@ specify the --labels option:</p>
 <pre><code>$ turkic visualize identifier /tmp --labels
 </code></pre>
 
-<p>--- Compensating Workers -----------------------------------------------------</p>
+<h2>
+<a name="----compensating-workers----" class="anchor" href="#----compensating-workers----"><span class="octicon octicon-link"></span></a>--- Compensating Workers ---</h2>
 
 <p>When you are ready, you can compensate workers:</p>
 
@@ -479,7 +494,8 @@ specify the --labels option:</p>
 paying all workers regardless of their quality. You should attempt to pay
 workers at least once per day.</p>
 
-<p>--- Finding Jobs -------------------------------------------------------------</p>
+<h2>
+<a name="----finding-jobs----" class="anchor" href="#----finding-jobs----"><span class="octicon octicon-link"></span></a>--- Finding Jobs ---</h2>
 
 <p>If you have found a small mistake in a video and want to make
 the correction yourself, you can start an annotation session initialized with
@@ -515,7 +531,8 @@ HIT ID, you can use the find command:</p>
 <pre><code>$ turkic find --hitid HITID
 </code></pre>
 
-<p>--- Quality Control ----------------------------------------------------------</p>
+<h2>
+<a name="----quality-control----" class="anchor" href="#----quality-control----"><span class="octicon octicon-link"></span></a>--- Quality Control ---</h2>
 
 <p>The gold standard does a "pretty good" job of weeding out bad workers.
 Nonetheless, there will always be bad workers that we must identify and
@@ -556,7 +573,8 @@ work, and respawn their jobs with the command:</p>
 <pre><code>$ turkic invalidate --hit hitid
 </code></pre>
 
-<p>--- Listing all Videos -------------------------------------------------------</p>
+<h2>
+<a name="----listing-all-videos----" class="anchor" href="#----listing-all-videos----"><span class="octicon octicon-link"></span></a>--- Listing all Videos ---</h2>
 
 <p>You can retrieve a list of all videos in the system with:</p>
 
@@ -590,7 +608,8 @@ $ turkic list --published --count
 <pre><code>$ turkic list --stats
 </code></pre>
 
-<p>--- Managing Workers ---------------------------------------------------------</p>
+<h2>
+<a name="----managing-workers----" class="anchor" href="#----managing-workers----"><span class="octicon octicon-link"></span></a>--- Managing Workers ---</h2>
 
 <p>You can list all known workers with the command:</p>
 
@@ -609,7 +628,8 @@ $ turkic workers --unblock workerid
 <pre><code>$ turkic workers --search A3M
 </code></pre>
 
-<p>--- Deleting a Video ---------------------------------------------------------</p>
+<h2>
+<a name="----deleting-a-video----" class="anchor" href="#----deleting-a-video----"><span class="octicon octicon-link"></span></a>--- Deleting a Video ---</h2>
 
 <p>You can delete a video at any time with:</p>
 
@@ -624,7 +644,8 @@ warn you and abort. You can force deletion with:</p>
 
 <p>which will REMOVE ALL DATA AND CANNOT BE UNDONE.</p>
 
-<p>== FEEDBACK AND BUGS ==========================================================</p>
+<h1>
+<a name="-feedback-and-bugs-" class="anchor" href="#-feedback-and-bugs-"><span class="octicon octicon-link"></span></a>== FEEDBACK AND BUGS ==</h1>
 
 <p>Please direct all comments and report all bugs to:</p>
 
