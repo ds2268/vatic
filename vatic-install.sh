@@ -23,7 +23,7 @@ sudo easy_install -U numpy
 
 git clone https://github.com/ds2268/turkic.git
 git clone https://github.com/ds2268/pyvision.git
-git clone -b contrib https://github.com/ds2268/vatic.git
+git clone https://github.com/ds2268/vatic.git
 
 cd turkic
 sudo python setup.py install
